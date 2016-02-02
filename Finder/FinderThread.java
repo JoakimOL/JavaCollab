@@ -135,7 +135,8 @@ public class FinderThread implements Runnable{
 			return false;
 		}
 		for(File f: dirFiles){
-			if(f.getPath().equals(dir.getPath()+"\\"+query)){
+			Matcher queryM = queryP.matcher(f.getPath().subpath(f.toPath().getNameCount()-1,f.toPath().getNameCount()));
+			if(queryM.find()){
 				//System.out.format("trad nummer %d FANT DEN!\ndir: %s\n", id,f.toString());
 				if(m.leggTil(f)){
 					System.out.println("Funnet i " + f);

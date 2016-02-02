@@ -1,4 +1,5 @@
 import java.io.File;
+import java.util.regex.*;
 import java.nio.file.Path;
 import java.util.*;
 import java.io.*;
@@ -17,8 +18,13 @@ public class Finder{
 	private CountDownLatch barrier;
 	private Thread[] oversikt;
 
+	private PATTERN;
+	
 	public Finder(String query){
-		this.query = query;
+		
+		PATTERN = query;
+		Pattern queryP = Pattern.compile(PATTERN);
+		
 		currentDir =new File(System.getProperty("user.dir"));
 		oversikt = new Thread[f.toPath().getNameCount()+1];
 		System.out.println(oversikt.length);
