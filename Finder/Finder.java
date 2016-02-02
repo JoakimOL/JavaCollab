@@ -19,7 +19,6 @@ public class Finder{
 
 	public Finder(String query){
 		this.query = query;
-		f =new File(System.getProperty("user.dir"));
 		currentDir =new File(System.getProperty("user.dir"));
 		oversikt = new Thread[f.toPath().getNameCount()+1];
 		System.out.println(oversikt.length);

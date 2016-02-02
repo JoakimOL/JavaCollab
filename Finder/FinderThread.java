@@ -12,7 +12,7 @@ public class FinderThread implements Runnable{
 	private String query;
 	private File[] possibleRoutes;
 	private File currentDir;
-	private File[1] noGo = {new File("C:\\windows\\"),null};
+	private File[] noGo = {new File("C:\\windows\\"),null};
 	private Monitor m;
 	private CountDownLatch barrier;
 
@@ -24,6 +24,7 @@ public class FinderThread implements Runnable{
 		possibleRoutes = findPossibleRoutes();
 		id = nr;
 		nr++;
+		m.leggInnNogo(currentDir);
 		System.out.format("trad nummer %d, i mappe %s\n",id,currentDir);
 	}
 
@@ -48,6 +49,8 @@ public class FinderThread implements Runnable{
 	*@return array med mapper
 	*/
 	public File[] findPossibleRoutes(){
+		//Kan garantert gjores bedre
+		//Todo
 		File[] temp = currentDir.listFiles();
 		ArrayList<File> temp2 = new ArrayList<>();
 		for(File f: temp){
@@ -68,6 +71,8 @@ public class FinderThread implements Runnable{
 	*@return Liste over mapper
 	*/
 	public File[] findPossibleRoutes(File f){
+		//Kan garantert gjores bedre
+		//Todo
 		File[] temp = f.listFiles();
 		ArrayList<File> temp2 = new ArrayList<>();
 		if(temp != null){
@@ -96,7 +101,7 @@ public class FinderThread implements Runnable{
 		File[] routes = findPossibleRoutes();
 		for(File f: possibleRoutes){
 			//System.out.println(f);
-			if(f != noGo && f != null){
+			if(f != noGo[0] && f != noGo[1] && f != null){
 				goUp(f);
 			}
 		}
@@ -111,9 +116,7 @@ public class FinderThread implements Runnable{
 		search(query,fil);
 		File[] routes = findPossibleRoutes(fil);
 		for(File f: possibleRoutes){
-			//System.out.format("soker i %s\n",f);
-			//System.out.println(f);
-			if(f != noGo && f != null){
+			if(f != noGo[0] && f != noGo[1] && f != null){
 				goUp(f);
 			}
 		}
@@ -148,7 +151,8 @@ public class FinderThread implements Runnable{
 	*/
 	@Override
 	public void run(){
-		//System.out.format("\ntrad nummer %d sin nogo: %s\n",id, noGo == null ? "":noGo.toString()+"\n");
+		noGo[1] = m.hentNoGo(id);
+		//System.out.format("dette er trad nummer %d, min currentdir er %s\nmine nogo dirs er \n-%s\n-%s\n",id,currentDir,noGo[0],noGo[1]);
 		search(query,currentDir);
 		goUp();
 		System.out.format("trad nummer %d er ferdig.\n",id);

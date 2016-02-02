@@ -5,11 +5,10 @@ import java.io.File;
 */
 public class Monitor{
 	private ArrayList<File> liste = new ArrayList<>();
-
-	private final int antallThreads;
-
+	private File[] noGoList;
+	private int teller = 0;
 	public Monitor(int threads){
-		antallThreads = threads;
+		noGoList = new File[threads];
 	}
 
 	/**
@@ -31,15 +30,20 @@ public class Monitor{
 	*		i den filen
 	*/
 	synchronized public void leggInnNogo(File f){
-		return;
+		noGoList[teller++] = f;
 	}
+
 	/**
 	* Lar en trad hente sin riktige nogo-mappe basert pa ID
 	*@param index Henter ut riktig nogo directory til trad basert pa ID
 	*@return mappen som er nogo
 	*/
-	synchronized public File hentNoGo(){
-		return null;
+	synchronized public File hentNoGo(int index){
+		int temp = index-1;
+		if(temp < 0){
+			return null;
+		}
+		return noGoList[temp];
 	}
 
 	/**
