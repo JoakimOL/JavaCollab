@@ -2,6 +2,7 @@ import java.util.ArrayList;
 import java.io.File;
 import java.util.concurrent.CountDownLatch;
 import java.nio.file.Path;
+import java.util.regex.*;
 /**
 *Trad som soker etter et gitt query
 *@author Joakim Lier
@@ -15,7 +16,8 @@ public class FinderThread implements Runnable{
 	private File[] noGo = {new File("C:\\windows\\"),null};
 	private Monitor m;
 	private CountDownLatch barrier;
-
+	private String PATTERN;
+	private Pattern queryP;
 	public FinderThread(String query,File currentDir,Monitor m,CountDownLatch barrier){
 		this.currentDir = currentDir;
 		this.query = query;
@@ -26,6 +28,9 @@ public class FinderThread implements Runnable{
 		nr++;
 		m.leggInnNogo(currentDir);
 		System.out.format("trad nummer %d, i mappe %s\n",id,currentDir);
+
+		PATTERN = query;
+		queryP = Pattern.compile(PATTERN);
 	}
 
 	/**
@@ -135,7 +140,7 @@ public class FinderThread implements Runnable{
 			return false;
 		}
 		for(File f: dirFiles){
-			Matcher queryM = queryP.matcher(f.getPath().subpath(f.toPath().getNameCount()-1,f.toPath().getNameCount()));
+			Matcher queryM = queryP.matcher(f.getAbsolutePath());
 			if(queryM.find()){
 				//System.out.format("trad nummer %d FANT DEN!\ndir: %s\n", id,f.toString());
 				if(m.leggTil(f)){

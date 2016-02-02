@@ -18,20 +18,17 @@ public class Finder{
 	private CountDownLatch barrier;
 	private Thread[] oversikt;
 
-	private PATTERN;
+	private String PATTERN;
 	
 	public Finder(String query){
-		
-		PATTERN = query;
-		Pattern queryP = Pattern.compile(PATTERN);
-		
+		this.query = query;
 		currentDir =new File(System.getProperty("user.dir"));
-		oversikt = new Thread[f.toPath().getNameCount()+1];
+		oversikt = new Thread[currentDir.toPath().getNameCount()+1];
 		System.out.println(oversikt.length);
 		System.out.println(query);
 		stepsFromRoot =oversikt.length;
 		m = new Monitor(stepsFromRoot);
-		barrier = new CountDownLatch(f.toPath().getNameCount()+1);
+		barrier = new CountDownLatch(currentDir.toPath().getNameCount()+1);
 	}
 	/**
 	*Starter trader, barriere og til slutt printer resultat
