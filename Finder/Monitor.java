@@ -11,10 +11,14 @@ public class Monitor{
 		noGoList = new File[threads];
 	}
 
+	public void clearNogo(){
+		noGoList = null;
+	}
+
 	/**
 	*Legger til fil, hvis den ikke finnes allerede
 	*@param f Fila som er funnet
-	*@return true hvis lagt til, false ellerss
+	*@return true hvis lagt til, false ellers
 	*/
 	synchronized public boolean leggTil(File f){
 		if(!liste.contains(f)){
@@ -45,7 +49,6 @@ public class Monitor{
 		}
 		return noGoList[temp];
 	}
-
 	/**
 	*printer ut resultatet
 	*/

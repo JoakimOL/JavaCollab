@@ -2,49 +2,63 @@ import java.io.File;
 import java.util.regex.*;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.ArrayList;
 import java.io.*;
 import java.util.concurrent.CountDownLatch;
 /**
 *@author Joakim Lier
 */
 public class Finder{
+	private int stepsUp;
 	private int stepsFromRoot;
 	private String query;
+	private boolean args;
+	
 	private File f;
 	private File currentDir;
 	private File[] filesInCurrentDir;
 
 	private Monitor m;
-	private CountDownLatch barrier;
-	private Thread[] oversikt;
-
+	private CountDownLatch barrierdown;
+	private CountDownLatch barrierup;
+	private Thread[] oversiktDown;
+	private ArrayList<Thread> oversiktUp = new ArrayList<>();
 	private String PATTERN;
 	
-	public Finder(String query){
+	public Finder(String query,boolean args){
+		//stepsUp = goToTop();
 		this.query = query;
+		this.args = args;
 		currentDir =new File(System.getProperty("user.dir"));
-		oversikt = new Thread[currentDir.toPath().getNameCount()+1];
-		System.out.println(oversikt.length);
-		System.out.println(query);
-		stepsFromRoot =oversikt.length;
+		oversiktDown = new Thread[currentDir.toPath().getNameCount()+1];
+		stepsFromRoot =oversiktDown.length;
 		m = new Monitor(stepsFromRoot);
-		barrier = new CountDownLatch(currentDir.toPath().getNameCount()+1);
+		barrierdown = new CountDownLatch(currentDir.toPath().getNameCount()+1);
 	}
 	/**
 	*Starter trader, barriere og til slutt printer resultat
 	*/
 	public void start(){
 		for(int i = 0; i < stepsFromRoot; i ++){
-			oversikt[i] = new Thread(new FinderThread(query,currentDir,m,barrier));
+			oversiktDown[i] = new Thread(new FinderThread(query,currentDir,m,barrierdown,false,args));
 			goDown();
 		}
-		for(int i = oversikt.length-1; i > -1; i--){
-			oversikt[i].start();
+		
+		for(int i = oversiktDown.length-1; i > -1; i--){
+			oversiktDown[i].start();
+		}
+
+		int temp =sjekkOppover();
+		barrierup = new CountDownLatch(temp);
+		goToTop();
+		for(Thread t: oversiktUp){
+			t.start();
 		}
 
 		//venter pa at trader blir ferdige
 		try{
-			barrier.await();
+			barrierdown.await();
+			barrierup.await();
 		}
 		catch(InterruptedException ex){
 			return;
@@ -53,7 +67,66 @@ public class Finder{
 			m.print();
 		}
 	}
-	
+
+	/**
+	*goes an arbitrary path upwards till it reaches a dead end.
+	*@return number of steps upwards
+	*/
+	public int goToTop(){
+		goUp();
+		FinderThread temp = new FinderThread(query,currentDir,m,barrierup,true,args);
+		int teller = 1;
+		while(goUp()){
+			teller++;
+			if(!currentDir.equals(temp.getCurrentDir())){
+				temp.setNoGo(currentDir);
+			}
+			//System.out.format("\ntrad id: %d sin nogo satt til:\n%s\n",temp.getId(),currentDir);
+			oversiktUp.add(new Thread(temp));
+			temp = new FinderThread(query,currentDir,m,barrierup,true,args);
+		}
+		oversiktUp.add(new Thread(temp));
+		return teller;
+	}
+
+	public int sjekkOppover(){
+		File oldDir = currentDir;
+		goUp();
+		int teller = 1;
+		while(goUp()){
+			teller++;
+		}
+		currentDir = oldDir;
+		return teller;
+	}
+	/**
+	*Goes up to users if available, else arbitrary
+	*@return true if successful, false if no path available
+	*/
+	public boolean goUp(){
+		File[] temp = currentDir.listFiles();
+		File directory = null;
+		if(currentDir.equals(new File("C:\\"))){
+			directory = new File("C:\\Program Files");
+		}
+		//else if(!directory.exists()){
+		else{
+			String s1 = currentDir + "\\Common Files";
+			for(File f: temp){
+				if(f.isDirectory() && !f.isHidden() && !f.toString().equals(s1)){
+					directory = f;
+					break;
+				}
+			}
+		}
+
+		if(directory != null){
+			currentDir = directory;
+			return true;
+		}
+		return false;
+	}
+
 	/**
 	* go down one step.
 	* no longer assuming C-drive.
@@ -71,5 +144,9 @@ public class Finder{
 			currentDir = new File(drive+"\\");
 			return false;
 		}
+	}
+
+	public int getStepsUp(){
+		return stepsUp;
 	}
 }

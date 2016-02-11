@@ -8,12 +8,21 @@ public class Main{
 	public static void main(String[] args){
 		//FinderThread thread = new FinderThread("Test.txt",new File("C:\\users\\"));
 		//thread.run();
-
-		Scanner sc = new Scanner(System.in);
-		System.out.println("tast inn navn pa fil du vil soke pa");
-		Finder finder = new Finder(sc.nextLine());
-		long forSok = System.currentTimeMillis();
-		finder.start();
-		System.out.println("tid: " + (System.currentTimeMillis()-forSok));	
+		Finder finder;
+		if(args.length != 0){
+			finder = new Finder(args[0],true);
+			long forSok = System.currentTimeMillis();
+			finder.start();
+			System.out.println("tid: " + (System.currentTimeMillis()-forSok));
+		}
+		else{
+			Scanner sc = new Scanner(System.in);
+			System.out.println("tast inn navn pa fil du vil soke pa");
+			finder = new Finder(sc.nextLine(),false);
+		//finder.goToTop();
+			long forSok = System.currentTimeMillis();
+			finder.start();
+			System.out.println("tid: " + (System.currentTimeMillis()-forSok));	
+		}
 	}
 }

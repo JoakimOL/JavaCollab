@@ -8,8 +8,12 @@ import java.util.regex.*;
 *@author Joakim Lier
 */
 public class FinderThread implements Runnable{	
+	
 	static private int nr;
+	
 	private final int id;
+	private final boolean up;
+	private final boolean args;
 	private String query;
 	private File[] possibleRoutes;
 	private File currentDir;
@@ -18,16 +22,23 @@ public class FinderThread implements Runnable{
 	private CountDownLatch barrier;
 	private String PATTERN;
 	private Pattern queryP;
-	public FinderThread(String query,File currentDir,Monitor m,CountDownLatch barrier){
+
+	public FinderThread(String query,File currentDir,Monitor m,CountDownLatch barrier, boolean up,boolean args){
 		this.currentDir = currentDir;
 		this.query = query;
 		this.m = m;
+		this.args = args;
 		this.barrier = barrier;
 		possibleRoutes = findPossibleRoutes();
 		id = nr;
 		nr++;
-		m.leggInnNogo(currentDir);
-		System.out.format("trad nummer %d, i mappe %s\n",id,currentDir);
+		this.up = up;
+		if(!up){
+			m.leggInnNogo(currentDir);
+		}
+		if(!args){
+			System.out.format("trad nummer %d, i mappe %s\n",id,currentDir);
+		}
 
 		PATTERN = query;
 		queryP = Pattern.compile(PATTERN);
@@ -58,7 +69,7 @@ public class FinderThread implements Runnable{
 		//Todo
 		File[] temp = currentDir.listFiles();
 		ArrayList<File> temp2 = new ArrayList<>();
-		for(File f: temp){
+		for(File f: temp)	{
 			if(f.isDirectory()){
 				temp2.add(f);
 			}
@@ -103,6 +114,9 @@ public class FinderThread implements Runnable{
 	*/
 	public boolean goUp(){
 		search(query,currentDir);
+		if(id == nr){
+			return true;
+		}
 		File[] routes = findPossibleRoutes();
 		for(File f: possibleRoutes){
 			//System.out.println(f);
@@ -144,7 +158,10 @@ public class FinderThread implements Runnable{
 			if(queryM.find()){
 				//System.out.format("trad nummer %d FANT DEN!\ndir: %s\n", id,f.toString());
 				if(m.leggTil(f)){
-					System.out.println("Funnet i " + f);
+					if(!args){
+						System.out.println("Funnet i " + f);
+					}
+
 				}
 				return true;
 			}
@@ -157,12 +174,19 @@ public class FinderThread implements Runnable{
 	*/
 	@Override
 	public void run(){
-		noGo[1] = m.hentNoGo(id);
+		if(!up){
+			noGo[1] = m.hentNoGo(id);
+		}
 		//System.out.format("dette er trad nummer %d, min currentdir er %s\nmine nogo dirs er \n-%s\n-%s\n",id,currentDir,noGo[0],noGo[1]);
 		search(query,currentDir);
-		goUp();
-		System.out.format("trad nummer %d er ferdig.\n",id);
+		if(id != nr-1){
+			goUp();
+		}
 		barrier.countDown();
+		if(!args){
+			System.out.format("trad nummer %d er ferdig.\n",id);
+		}
+
 	}
 	/**
 	* returns path as a string for string representation
@@ -171,5 +195,12 @@ public class FinderThread implements Runnable{
 	@Override
 	public String toString(){
 		return currentDir.toString();
+	}
+	/**
+	* returns the id of this thread as an int
+	*@return id this threads id number
+	*/
+	public int getId(){
+		return id;
 	}
 }
