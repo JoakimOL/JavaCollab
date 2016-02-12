@@ -1,4 +1,3 @@
-package sample;
 import java.io.File;
 import java.util.regex.*;
 import java.nio.file.Path;
@@ -13,6 +12,8 @@ public class Finder{
 	private int stepsUp;
 	private int stepsFromRoot;
 	private String query;
+	private boolean args;
+	private String drive;
 	
 	private File f;
 	private File currentDir;
@@ -25,9 +26,10 @@ public class Finder{
 	private ArrayList<Thread> oversiktUp = new ArrayList<>();
 	private String PATTERN;
 	
-	public Finder(String query){
+	public Finder(String query,boolean args){
 		//stepsUp = goToTop();
 		this.query = query;
+		this.args = args;
 		currentDir =new File(System.getProperty("user.dir"));
 		oversiktDown = new Thread[currentDir.toPath().getNameCount()+1];
 		stepsFromRoot =oversiktDown.length;
@@ -39,7 +41,7 @@ public class Finder{
 	*/
 	public void start(){
 		for(int i = 0; i < stepsFromRoot; i ++){
-			oversiktDown[i] = new Thread(new FinderThread(query,currentDir,m,barrierdown,false));
+			oversiktDown[i] = new Thread(new FinderThread(query,currentDir,m,barrierdown,false,args));
 			goDown();
 		}
 		
@@ -48,7 +50,6 @@ public class Finder{
 		}
 
 		int temp =sjekkOppover();
-		System.out.println(temp);
 		barrierup = new CountDownLatch(temp);
 		goToTop();
 		for(Thread t: oversiktUp){
@@ -74,7 +75,7 @@ public class Finder{
 	*/
 	public int goToTop(){
 		goUp();
-		FinderThread temp = new FinderThread(query,currentDir,m,barrierup,true);
+		FinderThread temp = new FinderThread(query,currentDir,m,barrierup,true,args);
 		int teller = 1;
 		while(goUp()){
 			teller++;
@@ -83,7 +84,7 @@ public class Finder{
 			}
 			//System.out.format("\ntrad id: %d sin nogo satt til:\n%s\n",temp.getId(),currentDir);
 			oversiktUp.add(new Thread(temp));
-			temp = new FinderThread(query,currentDir,m,barrierup,true);
+			temp = new FinderThread(query,currentDir,m,barrierup,true,args);
 		}
 		oversiktUp.add(new Thread(temp));
 		return teller;
@@ -99,8 +100,9 @@ public class Finder{
 		currentDir = oldDir;
 		return teller;
 	}
+	
 	/**
-	*Goes up to users if available, else arbitrary
+	*Goes up to program files if available, else arbitrary
 	*@return true if successful, false if no path available
 	*/
 	public boolean goUp(){
@@ -134,18 +136,21 @@ public class Finder{
 	*@return true if successful, false if root
 	*/
 	public boolean goDown(){
-		String drive = System.getenv().get("HOMEDRIVE");
+		drive = System.getenv().get("HOMEDRIVE");
 		try{
 			currentDir = new File(drive + "\\" + currentDir.toPath().subpath(0,currentDir.toPath().getNameCount()-1).toFile().getPath());
 			filesInCurrentDir = currentDir.listFiles();
 			return true;
 		}
-		catch(Exception e){
+		catch(IllegalArgumentException e){
 			currentDir = new File(drive+"\\");
 			return false;
 		}
 	}
-
+	/**
+	*returns the value of the stepsUp variable
+	*@return number of steps upwards till end
+	*/
 	public int getStepsUp(){
 		return stepsUp;
 	}

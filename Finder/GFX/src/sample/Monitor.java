@@ -1,4 +1,3 @@
-package sample;
 import java.util.ArrayList;
 import java.io.File;
 /**
@@ -8,12 +7,12 @@ public class Monitor{
 	private ArrayList<File> liste = new ArrayList<>();
 	private File[] noGoList;
 	private int teller = 0;
+	/**
+	*constructor, sets up a list of nogo-directories for the threads made on the way down.
+	*@param threads number of made on the way down, not up.
+	*/
 	public Monitor(int threads){
 		noGoList = new File[threads];
-	}
-
-	public void clearNogo(){
-		noGoList = null;
 	}
 
 	/**
@@ -58,5 +57,13 @@ public class Monitor{
 		for(File f: liste){
 			System.out.format("funnet i %s\n",f);
 		}
+	}
+	/**
+	*get element from found files - liste - and return it
+	*@param i index i as int
+	*@return file-element at index i
+	*/
+	public File getElement(int index){
+		return liste.get(index);
 	}
 }

@@ -1,20 +1,4 @@
 Treff i: 
-funnet i c:\Users\Joakim\OneDrive\NTNU\Lok\JavaCollab\Finder\Main.java
-funnet i c:\Users\Joakim\OneDrive\NTNU\Lok\JavaCollab\Finder\GFX\src\sample\Main.java
-funnet i C:\Users\Joakim\OneDrive\NTNU\Lok\Java\backup\Main.java
-funnet i C:\Users\Joakim\OneDrive\NTNU\Lok\Java\Crowd\Main.java
-funnet i C:\Users\Joakim\OneDrive\NTNU\Lok\Java\Engine\Main.java
-funnet i C:\Users\Joakim\OneDrive\NTNU\Lok\Java\Finder\Main.java
-funnet i C:\Users\Joakim\OneDrive\NTNU\Lok\Java\Klokke\Main.java
-funnet i C:\Users\Joakim\OneDrive\NTNU\Lok\Java\platform\Main.java
-funnet i C:\Users\Joakim\OneDrive\NTNU\Lok\Java\sortering\Main.java
-funnet i C:\Users\Joakim\OneDrive\NTNU\Lok\Java\visual\Main.java
-funnet i C:\Users\Joakim\OneDrive\NTNU\TDT4180 - MMI\JavaFX-test 1\Main.java
-funnet i C:\Users\Joakim\OneDrive\NTNU\TDT4180 - MMI\multiple panels\Main.java
-funnet i C:\Users\Joakim\OneDrive\NTNU\TDT4180 - MMI\Øving 1\Geometry dash\src\sample\Main.java
-funnet i C:\Users\Joakim\OneDrive\NTNU\TDT4180 - MMI\Øving 1\hang man\src\sample\Main.java
-funnet i C:\Users\Joakim\OneDrive\NTNU\TDT4180 - MMI\Øving 1\Wordfeud\src\sample\Main.java
-funnet i C:\Users\Joakim\OneDrive\UiO 1. bachelor\INF1010\eksamensøv\iterable\Main.java
-funnet i C:\Users\Joakim\OneDrive\UiO 1. bachelor\INF1010\Joamp\Main.java
-funnet i C:\Users\Joakim\IdeaProjects\JavaFXtest\src\sample\Main.java
-tid: 13420
+- C:\Users\Joakim\Downloads\Kappa.png
+- C:\Users\Joakim\Pictures\Kappa.png
+tid: 16873

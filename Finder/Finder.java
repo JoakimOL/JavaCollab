@@ -13,6 +13,7 @@ public class Finder{
 	private int stepsFromRoot;
 	private String query;
 	private boolean args;
+	private String drive;
 	
 	private File f;
 	private File currentDir;
@@ -36,14 +37,15 @@ public class Finder{
 		barrierdown = new CountDownLatch(currentDir.toPath().getNameCount()+1);
 	}
 	/**
-	*Starter trader, barriere og til slutt printer resultat
+	*starts threads, barriers and finally prints result
 	*/
 	public void start(){
 		for(int i = 0; i < stepsFromRoot; i ++){
 			oversiktDown[i] = new Thread(new FinderThread(query,currentDir,m,barrierdown,false,args));
 			goDown();
 		}
-		
+		//oversiktDown[stepsFromRoot-1].setNoGo(new File("C:\\Program Files"),2);
+
 		for(int i = oversiktDown.length-1; i > -1; i--){
 			oversiktDown[i].start();
 		}
@@ -79,7 +81,7 @@ public class Finder{
 		while(goUp()){
 			teller++;
 			if(!currentDir.equals(temp.getCurrentDir())){
-				temp.setNoGo(currentDir);
+				temp.setNoGo(currentDir,1);
 			}
 			//System.out.format("\ntrad id: %d sin nogo satt til:\n%s\n",temp.getId(),currentDir);
 			oversiktUp.add(new Thread(temp));
@@ -99,8 +101,9 @@ public class Finder{
 		currentDir = oldDir;
 		return teller;
 	}
+	
 	/**
-	*Goes up to users if available, else arbitrary
+	*Goes up to program files if available, else arbitrary
 	*@return true if successful, false if no path available
 	*/
 	public boolean goUp(){
@@ -134,18 +137,21 @@ public class Finder{
 	*@return true if successful, false if root
 	*/
 	public boolean goDown(){
-		String drive = System.getenv().get("HOMEDRIVE");
+		drive = System.getenv().get("HOMEDRIVE");
 		try{
 			currentDir = new File(drive + "\\" + currentDir.toPath().subpath(0,currentDir.toPath().getNameCount()-1).toFile().getPath());
 			filesInCurrentDir = currentDir.listFiles();
 			return true;
 		}
-		catch(Exception e){
+		catch(IllegalArgumentException e){
 			currentDir = new File(drive+"\\");
 			return false;
 		}
 	}
-
+	/**
+	*returns the value of the stepsUp variable
+	*@return number of steps upwards till end
+	*/
 	public int getStepsUp(){
 		return stepsUp;
 	}

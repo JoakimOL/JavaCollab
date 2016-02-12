@@ -19,10 +19,9 @@ public class Main{
 			Scanner sc = new Scanner(System.in);
 			System.out.println("tast inn navn pa fil du vil soke pa");
 			finder = new Finder(sc.nextLine(),false);
-		//finder.goToTop();
 			long forSok = System.currentTimeMillis();
 			finder.start();
-			System.out.println("tid: " + (System.currentTimeMillis()-forSok));	
+			System.out.format("tid: %dms",(System.currentTimeMillis()-forSok));	
 		}
 	}
 }

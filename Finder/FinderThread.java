@@ -17,7 +17,7 @@ public class FinderThread implements Runnable{
 	private String query;
 	private File[] possibleRoutes;
 	private File currentDir;
-	private File[] noGo = {new File("C:\\windows\\"),null};
+	private File[] noGo = {new File("C:\\windows\\"),null,null};
 	private Monitor m;
 	private CountDownLatch barrier;
 	private String PATTERN;
@@ -55,9 +55,13 @@ public class FinderThread implements Runnable{
 	/**
 	*sett hvilke mapper som ikke skal sokes i.
 	*@param noGo fil som ikke skal sokes i.
+	*@param index set which nogo to set
 	*/
-	public void setNoGo(File noGo){
-		this.noGo[1] = noGo;
+	public void setNoGo(File noGo,int index){
+		if(index > this.noGo.length){
+			return;
+		}
+		this.noGo[index] = noGo;
 	}
 
 	/**
@@ -93,11 +97,9 @@ public class FinderThread implements Runnable{
 		ArrayList<File> temp2 = new ArrayList<>();
 		if(temp != null){
 			for(File fil: temp){
-				if(f != null){
-					if(fil.isDirectory()){
-						temp2.add(fil);
-					}
-				}	
+				if(fil.isDirectory()){
+					temp2.add(fil);
+				}
 			}
 		}
 		temp = null;
@@ -127,8 +129,8 @@ public class FinderThread implements Runnable{
 		return true;
 	}
 	/**
-	*Go up from file
-	*@param Fil file to go up from
+	*Goes up to all possible routes from given file
+	*@param fil file to go up from
 	*@return true
 	*/
 	public boolean goUp(File fil){
@@ -156,7 +158,6 @@ public class FinderThread implements Runnable{
 		for(File f: dirFiles){
 			Matcher queryM = queryP.matcher(f.getAbsolutePath());
 			if(queryM.find()){
-				//System.out.format("trad nummer %d FANT DEN!\ndir: %s\n", id,f.toString());
 				if(m.leggTil(f)){
 					if(!args){
 						System.out.println("Funnet i " + f);

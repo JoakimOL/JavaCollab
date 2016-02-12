@@ -1,4 +1,3 @@
-package sample;
 import java.util.ArrayList;
 import java.io.File;
 import java.util.concurrent.CountDownLatch;
@@ -14,6 +13,7 @@ public class FinderThread implements Runnable{
 	
 	private final int id;
 	private final boolean up;
+	private final boolean args;
 	private String query;
 	private File[] possibleRoutes;
 	private File currentDir;
@@ -23,10 +23,11 @@ public class FinderThread implements Runnable{
 	private String PATTERN;
 	private Pattern queryP;
 
-	public FinderThread(String query,File currentDir,Monitor m,CountDownLatch barrier, boolean up){
+	public FinderThread(String query,File currentDir,Monitor m,CountDownLatch barrier, boolean up,boolean args){
 		this.currentDir = currentDir;
 		this.query = query;
 		this.m = m;
+		this.args = args;
 		this.barrier = barrier;
 		possibleRoutes = findPossibleRoutes();
 		id = nr;
@@ -35,7 +36,9 @@ public class FinderThread implements Runnable{
 		if(!up){
 			m.leggInnNogo(currentDir);
 		}
-		System.out.format("trad nummer %d, i mappe %s\n",id,currentDir);
+		if(!args){
+			System.out.format("trad nummer %d, i mappe %s\n",id,currentDir);
+		}
 
 		PATTERN = query;
 		queryP = Pattern.compile(PATTERN);
@@ -90,11 +93,9 @@ public class FinderThread implements Runnable{
 		ArrayList<File> temp2 = new ArrayList<>();
 		if(temp != null){
 			for(File fil: temp){
-				if(f != null){
-					if(fil.isDirectory()){
-						temp2.add(fil);
-					}
-				}	
+				if(fil.isDirectory()){
+					temp2.add(fil);
+				}
 			}
 		}
 		temp = null;
@@ -124,7 +125,7 @@ public class FinderThread implements Runnable{
 		return true;
 	}
 	/**
-	*Go up from file
+	*Goes up to all possible routes from given file
 	*@param Fil file to go up from
 	*@return true
 	*/
@@ -153,9 +154,11 @@ public class FinderThread implements Runnable{
 		for(File f: dirFiles){
 			Matcher queryM = queryP.matcher(f.getAbsolutePath());
 			if(queryM.find()){
-				//System.out.format("trad nummer %d FANT DEN!\ndir: %s\n", id,f.toString());
 				if(m.leggTil(f)){
-					System.out.println("Funnet i " + f);
+					if(!args){
+						System.out.println("Funnet i " + f);
+					}
+
 				}
 				return true;
 			}
@@ -177,7 +180,10 @@ public class FinderThread implements Runnable{
 			goUp();
 		}
 		barrier.countDown();
-		System.out.format("trad nummer %d er ferdig.\n",id);
+		if(!args){
+			System.out.format("trad nummer %d er ferdig.\n",id);
+		}
+
 	}
 	/**
 	* returns path as a string for string representation
